@@ -18,28 +18,36 @@ public class FA1
 {
     private class State
     {
-        public Dictionary<char, State> Transitions = new Dictionary<char, State>();
+        public string Name;
+        public Dictionary<char, State> Transitions;
         public bool IsAcceptState;
     }
 
-    private State start = new State { IsAcceptState = false };
-    private State oneZero = new State { IsAcceptState = false };
-    private State oneZeroOne = new State { IsAcceptState = true };
+    private State InitialState { get; set; }
 
     public FA1()
     {
-        start.Transitions['0'] = oneZero;
+        State onlyOneZero = new State { Name = "onlyOneZero", IsAcceptState = true, Transitions = new Dictionary<char, State>() };
+        State start = new State { Name = "start", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+        State dead = new State { Name = "dead", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+
+        start.Transitions['0'] = onlyOneZero;
         start.Transitions['1'] = start;
-        oneZero.Transitions['1'] = oneZeroOne;
+        onlyOneZero.Transitions['0'] = dead;
+        onlyOneZero.Transitions['1'] = onlyOneZero;
+        dead.Transitions['0'] = dead;
+        dead.Transitions['1'] = dead;
+
+        InitialState = start;
     }
 
-    public bool? Run(string s)
+    public bool Run(string input)
     {
-        State current = start;
-        foreach (char c in s)
+        State current = InitialState;
+        foreach (char symbol in input)
         {
-            if (!current.Transitions.TryGetValue(c, out current))
-                return null;
+            if (!current.Transitions.TryGetValue(symbol, out current))
+                return false;
         }
         return current.IsAcceptState;
     }
@@ -49,34 +57,39 @@ public class FA2
 {
     private class State
     {
-        public Dictionary<char, State> Transitions = new Dictionary<char, State>();
+        public string Name;
+        public Dictionary<char, State> Transitions;
         public bool IsAcceptState;
     }
 
-    private State start = new State();
-    private State oddZero = new State();
-    private State oddOne = new State();
-    private State oddBoth = new State { IsAcceptState = true };
+    private State InitialState { get; set; }
 
     public FA2()
     {
-        start.Transitions['0'] = oddZero;
-        start.Transitions['1'] = oddOne;
-        oddZero.Transitions['0'] = start;
-        oddZero.Transitions['1'] = oddBoth;
-        oddOne.Transitions['0'] = oddBoth;
-        oddOne.Transitions['1'] = start;
-        oddBoth.Transitions['0'] = oddOne;
-        oddBoth.Transitions['1'] = oddZero;
+        State oddZerosOddOnes = new State { Name = "oddZerosOddOnes", IsAcceptState = true, Transitions = new Dictionary<char, State>() };
+        State oddZerosEvenOnes = new State { Name = "oddZerosEvenOnes", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+        State evenZerosOddOnes = new State { Name = "evenZerosOddOnes", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+        State evenZerosEvenOnes = new State { Name = "evenZerosEvenOnes", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+
+        oddZerosOddOnes.Transitions['0'] = evenZerosOddOnes;
+        oddZerosOddOnes.Transitions['1'] = oddZerosEvenOnes;
+        oddZerosEvenOnes.Transitions['0'] = evenZerosEvenOnes;
+        oddZerosEvenOnes.Transitions['1'] = oddZerosOddOnes;
+        evenZerosOddOnes.Transitions['0'] = oddZerosOddOnes;
+        evenZerosOddOnes.Transitions['1'] = evenZerosEvenOnes;
+        evenZerosEvenOnes.Transitions['0'] = oddZerosEvenOnes;
+        evenZerosEvenOnes.Transitions['1'] = evenZerosOddOnes;
+
+        InitialState = evenZerosEvenOnes;
     }
 
-    public bool? Run(string s)
+    public bool Run(string input)
     {
-        State current = start;
-        foreach (char c in s)
+        State current = InitialState;
+        foreach (char symbol in input)
         {
-            if (!current.Transitions.TryGetValue(c, out current))
-                return null;
+            if (!current.Transitions.TryGetValue(symbol, out current))
+                return false;
         }
         return current.IsAcceptState;
     }
@@ -86,36 +99,40 @@ public class FA3
 {
     private class State
     {
-        public Dictionary<char, State> Transitions = new Dictionary<char, State>();
+        public string Name;
+        public Dictionary<char, State> Transitions;
         public bool IsAcceptState;
     }
 
-    private State start = new State();
-    private State one = new State();
-    private State twoOnes = new State { IsAcceptState = true };
+    private State InitialState { get; set; }
 
     public FA3()
     {
+        State start = new State { Name = "start", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+        State oneRead = new State { Name = "oneRead", IsAcceptState = false, Transitions = new Dictionary<char, State>() };
+        State twoOnesRead = new State { Name = "twoOnesRead", IsAcceptState = true, Transitions = new Dictionary<char, State>() };
+        
         start.Transitions['0'] = start;
-        start.Transitions['1'] = one;
-        one.Transitions['0'] = start;
-        one.Transitions['1'] = twoOnes;
-        twoOnes.Transitions['0'] = twoOnes;
-        twoOnes.Transitions['1'] = twoOnes;
+        start.Transitions['1'] = oneRead;
+        oneRead.Transitions['0'] = start;
+        oneRead.Transitions['1'] = twoOnesRead;
+        twoOnesRead.Transitions['0'] = twoOnesRead;
+        twoOnesRead.Transitions['1'] = twoOnesRead;
+        
+        InitialState = start;
     }
 
-    public bool? Run(string s)
+    public bool Run(string input)
     {
-        State current = start;
-        foreach (char c in s)
+        State current = InitialState;
+        foreach (char symbol in input)
         {
-            if (!current.Transitions.TryGetValue(c, out current))
-                return null;
+            if (!current.Transitions.TryGetValue(symbol, out current))
+                return false;
         }
         return current.IsAcceptState;
     }
 }
-
   class Program
   {
     static void Main(string[] args)
